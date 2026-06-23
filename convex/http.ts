@@ -244,8 +244,16 @@ http.route({
       dietPlan = validateDietPlan(dietPlan);
 
       // save to our DB: CONVEX
+      const user = await ctx.runQuery(api.users.getUserByClerkId, { clerkId: user_id });
+      if (!user) {
+        return new Response(JSON.stringify({ success: false, error: "User not found" }), {
+          status: 404,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+
       const planId = await ctx.runMutation((api as any).plans.createPlan, {
-        userId: user_id,
+        userId: user._id,
         dietPlan,
         isActive: true,
         workoutPlan,
